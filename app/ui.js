@@ -3,6 +3,7 @@ const welcomeDiv = document.getElementById("WelcomeMessage");
 const signInButton = document.getElementById("SignIn");
 const cardDiv = document.getElementById("card-div");
 const mailButton = document.getElementById("readMail");
+const APIButton = document.getElementById("callAPI");
 const profileButton = document.getElementById("seeProfile");
 const profileDiv = document.getElementById("profile-div");
 
@@ -16,7 +17,8 @@ function showWelcomeMessage(account) {
 }
 
 function updateUI(data, endpoint) {
-    console.log('Graph API responded at: ' + new Date().toString());
+    console.log('API responded at: ' + new Date().toString());
+	//console.log(data);
 
     if (endpoint === graphConfig.graphMeEndpoint) {
         const title = document.createElement('p');
@@ -63,5 +65,8 @@ function updateUI(data, endpoint) {
                 }
             });
         }
+    } else {
+            const tabList = document.getElementById("list-tab");
+            tabList.innerHTML = data; // clear tabList at each readMail call
     }
 }

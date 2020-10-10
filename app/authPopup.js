@@ -2,6 +2,12 @@
 // configuration parameters are located at authConfig.js
 const myMSALObj = new msal.PublicClientApplication(msalConfig);
 
+// Initialize the Amazon Cognito credentials provider
+AWS.config.region = 'ap-southeast-2'; // Region
+AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+    IdentityPoolId: 'ap-southeast-2:b457261f-087a-4e66-9ddc-990a3a468404',
+});
+
 let username = "";
 
 function loadPage() {
@@ -10,6 +16,7 @@ function loadPage() {
      * https://github.com/AzureAD/microsoft-authentication-library-for-js/blob/dev/lib/msal-common/docs/Accounts.md
      */
     const currentAccounts = myMSALObj.getAllAccounts();
+	console.log(currentAccounts)
     if (currentAccounts === null) {
         return;
     } else if (currentAccounts.length > 1) {
@@ -18,6 +25,8 @@ function loadPage() {
     } else if (currentAccounts.length === 1) {
         username = currentAccounts[0].username;
         showWelcomeMessage(currentAccounts[0]);
+        setAWSCookie();
+        
     }
 }
 
@@ -69,6 +78,7 @@ function getTokenPopup(request) {
 
 function seeProfile() {
     getTokenPopup(loginRequest).then(response => {
+	console.log(response);
         callMSGraph(graphConfig.graphMeEndpoint, response.accessToken, updateUI);
         profileButton.classList.add('d-none');
         mailButton.classList.remove('d-none');
@@ -84,5 +94,24 @@ function readMail() {
         console.error(error);
     });
 }
+
+function callAPI() {
+
+    getTokenPopup(awstokenRequest).then(response => {
+	callAWS("https://bbk79042ak.execute-api.ap-southeast-2.amazonaws.com/api/test",response.accessToken,updateUI);
+    }).catch(error => {
+        console.error(error);
+    });
+}
+
+function setAWSCookie() {
+
+  getTokenPopup(awstokenRequest).then(response => {
+setCookie(response.accessToken,updateUI);
+  }).catch(error => {
+      console.error(error);
+  });
+}
+
 
 loadPage();
